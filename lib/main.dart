@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import './entities/item.dart';
+import './api/hn_api.dart';
 
 void main() => runApp(new MyApp());
 
@@ -7,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Hacker News',
       theme: new ThemeData(
         // This is the theme of your application.
         //
@@ -17,9 +19,9 @@ class MyApp extends StatelessWidget {
         // "hot reload" (press "r" in the console where you ran "flutter run",
         // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
         // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepOrange,
       ),
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
+      home: new MyHomePage(title: 'Top Stories'),
     );
   }
 }
@@ -43,17 +45,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<Item> threads = [];
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    getTopStories();
   }
 
   @override
@@ -65,45 +62,74 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: new Text(widget.title),
-      ),
-      body: new Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: new Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug paint" (press "p" in the console where you ran
-          // "flutter run", or select "Toggle Debug Paint" from the Flutter tool
-          // window in IntelliJ) to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Text(
-              'You have pushed the button this many times:',
-            ),
-            new Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
+        appBar: new AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: new Text(widget.title),
         ),
-      ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        body: getThreadsBody());
+  }
+
+  Widget getThreadsBody() {
+    //if (threads.length == 0) return new Center(child: new CircularProgressIndicator());
+    return new ListView.builder(
+      padding: new EdgeInsets.all(8.0),
+      itemCount: 1,
+      itemBuilder: (BuildContext context, int index) {
+        return new InkWell(
+            onTap: () => print("Retrieving article from row $index..."),
+            child: new Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Container(
+                      margin: const EdgeInsets.only(top: 12.0),
+                      child: new Text("lol",
+                          overflow: TextOverflow.fade, //TODO customize story text theme
+                          style: Theme.of(context).textTheme.title),
+                    ),
+                    new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
+                      new Container(
+                        margin: const EdgeInsets.symmetric(vertical: 2.0),
+                        child: new Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              new Text(
+                                "10h - danso",
+                                overflow: TextOverflow.clip, //TODO customize story text theme
+                                style: Theme.of(context).textTheme.body1,
+                              ),
+                              new Text(
+                                "niemanlab.org",
+                                overflow: TextOverflow.clip, //TODO customize story text theme
+                                style: Theme.of(context).textTheme.body1,
+                              )
+                            ]),
+                      ),
+                      new InkWell(
+                          onTap: () => print("Retrieving comments from row $index"),
+                          child: Container(
+                              padding: const EdgeInsets.only(top: 18.0, bottom: 6.0, left: 32.0),
+                              child: new Row(children: <Widget>[
+                                const Icon(
+                                  Icons.comment,
+                                  color: Colors.deepOrangeAccent,
+                                ),
+                                new Container(
+                                  margin: const EdgeInsets.only(left: 4.0, right: 40.0),
+                                  child: new Text(
+                                    "227",
+                                    style: TextStyle(
+                                        color: Colors.deepOrangeAccent,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                )
+                              ])))
+                    ]),
+                  ],
+                )));
+      },
     );
   }
 }
