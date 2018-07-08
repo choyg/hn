@@ -1,4 +1,11 @@
-class Item {
+import 'package:json_annotation/json_annotation.dart';
+part 'item.g.dart';
+
+@JsonSerializable()
+class Item extends Object with _$ItemSerializerMixin {
+  Item(this.id, this.deleted, this.type, this.by, this.time, this.text, this.dead, this.parent,
+      this.poll, this.kids, this.url, this.score, this.title, this.parts, this.descendants);
+
   int id;
   bool deleted;
   String type;
@@ -15,7 +22,5 @@ class Item {
   List<int> parts;
   int descendants;
 
-  Item fromJson(String json) {
-    
-  }
+  factory Item.fromJson(Map<String, dynamic> json) => _$ItemFromJson(json);
 }

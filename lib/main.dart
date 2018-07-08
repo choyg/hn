@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import './entities/item.dart';
 import './api/hn_api.dart';
+import './widgets/item_widget.dart';
 
 void main() => runApp(new MyApp());
 
@@ -45,12 +47,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Item> threads = [];
+  List<int> threads = [];
 
   @override
   void initState() {
     super.initState();
-    getTopStories();
+    loadStories();
   }
 
   @override
@@ -66,70 +68,37 @@ class _MyHomePageState extends State<MyHomePage> {
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: new Text(widget.title),
+          actions: <Widget>[
+            new IconButton(
+              icon: new Icon(Icons.refresh),
+              tooltip: "Refresh",
+              onPressed: loadStories,
+            )
+          ],
         ),
         body: getThreadsBody());
   }
 
   Widget getThreadsBody() {
-    //if (threads.length == 0) return new Center(child: new CircularProgressIndicator());
-    return new ListView.builder(
-      padding: new EdgeInsets.all(8.0),
-      itemCount: 1,
-      itemBuilder: (BuildContext context, int index) {
-        return new InkWell(
-            onTap: () => print("Retrieving article from row $index..."),
-            child: new Container(
-                margin: const EdgeInsets.symmetric(horizontal: 6.0),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    new Container(
-                      margin: const EdgeInsets.only(top: 12.0),
-                      child: new Text("lol",
-                          overflow: TextOverflow.fade, //TODO customize story text theme
-                          style: Theme.of(context).textTheme.title),
-                    ),
-                    new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-                      new Container(
-                        margin: const EdgeInsets.symmetric(vertical: 2.0),
-                        child: new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              new Text(
-                                "10h - danso",
-                                overflow: TextOverflow.clip, //TODO customize story text theme
-                                style: Theme.of(context).textTheme.body1,
-                              ),
-                              new Text(
-                                "niemanlab.org",
-                                overflow: TextOverflow.clip, //TODO customize story text theme
-                                style: Theme.of(context).textTheme.body1,
-                              )
-                            ]),
-                      ),
-                      new InkWell(
-                          onTap: () => print("Retrieving comments from row $index"),
-                          child: Container(
-                              padding: const EdgeInsets.only(top: 18.0, bottom: 6.0, left: 32.0),
-                              child: new Row(children: <Widget>[
-                                const Icon(
-                                  Icons.comment,
-                                  color: Colors.deepOrangeAccent,
-                                ),
-                                new Container(
-                                  margin: const EdgeInsets.only(left: 4.0, right: 40.0),
-                                  child: new Text(
-                                    "227",
-                                    style: TextStyle(
-                                        color: Colors.deepOrangeAccent,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                )
-                              ])))
-                    ]),
-                  ],
-                )));
-      },
+    if (threads.length == 0) return new Center(child: new CircularProgressIndicator());
+    return new RefreshIndicator(
+      onRefresh: loadStories,
+      child: new Scrollbar(
+        child: new ListView.builder(
+          itemCount: threads.length,
+          itemBuilder: (BuildContext context, int index) {
+            return new ItemWidget(itemId: threads[index]);
+          },
+        ),
+      ),
     );
+  }
+
+  Future<Null> loadStories() async {
+    this.threads = [];
+    mounted ? setState(() => {}) : null;
+    this.threads = await getTopStories();
+    mounted ? setState(() => {}) : null;
+    return null;
   }
 }
