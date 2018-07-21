@@ -1,4 +1,4 @@
-### a worse way of reading hacker news
+# a worse way of reading hacker news
 
 this is a shallow dive into using flutter for basic app stuff. majority of apps are api clients. can flutter accomplish this common task in an efficient and fun manner? sure.
 
