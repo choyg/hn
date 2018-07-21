@@ -17,14 +17,6 @@ Future<List<int>> getTopStories() async {
   return (itemIds as List).cast<int>();
 }
 
-Future<List<Story>> loadTopStories(List<int> ids) async {
-  var client = new http.Client();
-  var futures = ids.map((id) => getItem(id, client: client));
-  var topStories = await Future.wait(futures);
-  client.close();
-  return topStories;
-}
-
 Future<Story> getItem(id, {http.Client client}) async {
   var cached = await storyCache.get(id);
   if (cached != null) return cached;
