@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 import '../entities/story.dart';
 import '../api/hn_api.dart';
+import '../comments.dart';
 
 class ItemWidget extends StatefulWidget {
   ItemWidget({Key key, this.itemId}) : super(key: key);
@@ -44,19 +45,23 @@ class _ItemState extends State<ItemWidget> {
                     child:
                         new Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                       new Text(
-                        getDetails(),
+                        _getDetails(),
                         overflow: TextOverflow.clip,
                         style: Theme.of(context).textTheme.body1,
                       ),
                       new Text(
-                        getDomain(),
+                        story?.domain() ?? "...",
                         overflow: TextOverflow.clip,
                         style: Theme.of(context).textTheme.body1,
                       )
                     ]),
                   ),
                   new InkWell(
-                      onTap: () => print("Retrieving comments from row ${story.id}"),
+                      onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CommentsPage(story: this.story)),
+                          ),
                       child: Container(
                           padding: const EdgeInsets.only(top: 18.0, bottom: 6.0, left: 32.0),
                           child: new Row(children: <Widget>[
@@ -79,25 +84,6 @@ class _ItemState extends State<ItemWidget> {
             )));
   }
 
-  getDetails() {
-    if (this.story == null) return "...";
-    var hours = ((DateTime.now().millisecondsSinceEpoch / 1000 - this.story.time) / 3600).round();
-    return "${hours}h - ${story.by}";
-  }
-
-  getDomain() {
-    if (this.story == null) return "...";
-    if (story.url == null) return "";
-    try {
-      var domain = Uri.parse(story.url).host;
-      var length = min(domain.length, 30);
-      return domain.substring(0, length);
-    } catch (e) {
-      print(e);
-      return "";
-    }
-  }
-
   loadStory() async {
     try {
       this.story = await getItem(widget.itemId);
@@ -105,6 +91,11 @@ class _ItemState extends State<ItemWidget> {
     } catch (e) {
       print(e);
     }
+  }
+
+  String _getDetails() {
+    if (story == null) return "...";
+    return "${story.date()} - ${story.by}";
   }
 
   _launchURL() async {

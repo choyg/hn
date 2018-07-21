@@ -12,6 +12,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Hacker News',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MyHomePage(title: 'Top Stories'),
+      },
       theme: new ThemeData(
         // This is the theme of your application.
         //
@@ -21,9 +25,8 @@ class MyApp extends StatelessWidget {
         // "hot reload" (press "r" in the console where you ran "flutter run",
         // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
         // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.deepOrange,
+        primarySwatch: Colors.blueGrey,
       ),
-      home: new MyHomePage(title: 'Top Stories'),
     );
   }
 }
@@ -96,6 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<Null> loadStories() async {
     this.threads = [];
+    clearCache();
     mounted ? setState(() => {}) : null;
     this.threads = await getTopStories();
     mounted ? setState(() => {}) : null;
