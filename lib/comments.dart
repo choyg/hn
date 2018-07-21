@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import './entities/story.dart';
+import './widgets/comment_widget.dart';
+import './api/hn_api.dart';
 
 // Comments screen for a particular story
 class CommentsPage extends StatefulWidget {
@@ -13,9 +15,12 @@ class CommentsPage extends StatefulWidget {
 }
 
 class _CommentsState extends State<CommentsPage> {
+  List<int> commentIds = [];
+
   @override
   void initState() {
     super.initState();
+    _loadComments();
   }
 
   @override
@@ -27,6 +32,7 @@ class _CommentsState extends State<CommentsPage> {
           slivers: <Widget>[
             new SliverAppBar(
               primary: true,
+              title: new Text(widget.story.title),
               actions: <Widget>[
                 IconButton(
                   onPressed: () {},
@@ -42,16 +48,12 @@ class _CommentsState extends State<CommentsPage> {
                 ),
               ],
             ),
-            new SliverFixedExtentList(
-              itemExtent: 50.0,
+            new SliverList(
               delegate: new SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  return new Container(
-                    alignment: Alignment.center,
-                    color: Colors.lightBlue[100 * (index % 9)],
-                    child: new Text('list item $index'),
-                  );
+                  return new CommentWidget(commentId: commentIds[index]);
                 },
+                childCount: commentIds.length,
               ),
             ),
           ],
@@ -60,6 +62,12 @@ class _CommentsState extends State<CommentsPage> {
     );
   }
 
-  Future<Null> _loadComments() {}
-  Widget _getCommentsBody() {}
+  Future<Null> _loadComments() async {
+    this.commentIds = [];
+    clearCommentsCache();
+    mounted ? setState(() => {}) : null;
+    this.commentIds = widget.story.kids;
+    mounted ? setState(() => {}) : null;
+    return null;
+  }
 }

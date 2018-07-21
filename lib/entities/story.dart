@@ -13,6 +13,7 @@ class Story {
   int score;
   String title;
   int descendants;
+  List<int> kids;
 
   Story.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -23,7 +24,8 @@ class Story {
         url = json['url'],
         score = json['score'],
         title = json['title'],
-        descendants = json['descendants'];
+        descendants = json['descendants'],
+        kids = json['kids'].cast<int>();
 
   String domain() {
     if (url == null) return null;
