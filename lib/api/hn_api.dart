@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import '../entities/story.dart';
+import '../entities/comment.dart';
 import 'package:quiver/cache.dart';
-
 import 'package:http/http.dart' as http;
 
 const host = 'https://hacker-news.firebaseio.com/v0';
 var storyCache = new MapCache<int, Story>();
+var commentsCache = new MapCache<int, Comment>();
 
 Future<List<int>> getTopStories() async {
   var client = new http.Client();
@@ -27,6 +28,20 @@ Future<Story> getItem(id, {http.Client client}) async {
   return story;
 }
 
-clearCache() {
+Future<Comment> getComment(id) async {
+  var cached = await commentsCache.get(id);
+  if (cached != null) return cached;
+  var url = "$host/item/$id.json";
+  var response = await http.get(url);
+  var comment = Comment.fromJson(json.decode(response.body));
+  commentsCache.set(id, comment);
+  return comment;
+}
+
+clearStoriesCache() {
   storyCache = new MapCache<int, Story>();
+}
+
+clearCommentsCache() {
+  commentsCache = new MapCache<int, Comment>();
 }

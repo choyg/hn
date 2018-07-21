@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<Null> loadStories() async {
     this.threads = [];
-    clearCache();
+    clearStoriesCache();
     mounted ? setState(() => {}) : null;
     this.threads = await getTopStories();
     mounted ? setState(() => {}) : null;
